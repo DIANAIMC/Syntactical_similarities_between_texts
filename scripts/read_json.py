@@ -13,5 +13,5 @@ import sys
 #sys.path.append(ruta_carpeta)
 df = pd.read_json('data.json')
 print("Muestra los primeros 10 datos")
-df.head(10)
+print(df.head(10))
 
