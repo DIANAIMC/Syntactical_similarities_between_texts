@@ -3,15 +3,13 @@
 import pandas as pd
 import os
 import sys
-# Agrega la ruta de la carpeta que contiene el archivo JSON a la ruta de búsqueda de Python
-# Primero obtiene la ruta absoluta del archivo actual
-#ruta_actual = os.path.dirname(os.path.abspath('read_json.py'))
-# Luego, construye la ruta completa de la carpeta que contiene el archivo JSON
-#ruta_carpeta = os.path.join(ruta_actual, '/home/dianamunnoz/Syntactical_similarities_between_texts/data')
-# Finalmente, agrega la ruta de la carpeta a la ruta de búsqueda de Python
-#print(ruta_carpeta)
-#sys.path.append(ruta_carpeta)
+
 df = pd.read_json('data.json')
+
+print("")
+df['context'] = df['context'].apply(str.lower)
+df['questions'] = df['questions'].apply(lambda x: [e.lower() if isinstance(e, str) else e for e in x])
+df['ans'] = df['ans'].apply(lambda x: [e.lower() if isinstance(e, str) else e for e in x])
 print("Muestra los primeros 10 datos")
 print(df.head(10))
 
