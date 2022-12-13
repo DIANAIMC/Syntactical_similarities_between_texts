@@ -1,12 +1,14 @@
 #! /usr/bin/env python
 
+import numpy as np
 import pandas as pd
 import os
 import sys
 
 df = pd.read_json('data.json')
 
-print(" > Todo a lowercase")
+print('\n--------------------- Preprocessing ---------------------')
+print("\n > Todo a lowercase")
 df['context'] = df['context'].apply(str.lower)
 df['questions'] = df['questions'].apply(lambda x: [e.lower() if isinstance(e, str) else e for e in x])
 df['ans'] = df['ans'].apply(lambda x: [e.lower() if isinstance(e, str) else e for e in x])
@@ -76,5 +78,11 @@ print(" > Obtenemos la tabla jaccard")
 
 cols_to_select = ["jaccard_similarity", "contains_ans"]
 df_j = df_exploded.loc[:, cols_to_select]
-print(df_j.head(50))
 
+print('\n--------------------- Model training ---------------------')
+print("\n > Tomamos una muestra")
+
+np.random.seed(123454321)
+sample_size = 0.05 # Sample size as a percentage of the total population
+sample = df_j.sample(frac=sample_size)
+print(sample.head(50))
