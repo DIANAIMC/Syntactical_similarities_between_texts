@@ -47,8 +47,6 @@ def iterate_list(my_list,words):
             text_words = [w for w in text_words if w not in words]
             text = ' '.join(text_words)
             result.append(text)
-        else:
-            result.append(elem)
     # return the modified list
     return result
 
@@ -57,3 +55,11 @@ df['questions'] = df['questions'].apply(iterate_list,words=words)
 df['ans'] = df['ans'].apply(iterate_list,words=words)
 
 print(df.head(10))
+
+#aca empezamos a explotar las cosas.
+#ahora tenemos que usar para todo el exploded. please remember.
+
+df['context'] = df['context'].str.split('.')
+df_exploded = df.explode('context')
+df_exploded=df_exploded.set_index(['context']).apply(pd.Series.explode).reset_index()
+print(df_exploded.head(20))
