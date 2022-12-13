@@ -64,4 +64,9 @@ df_exploded['jaccard_similarity'] = df_exploded.apply(lambda x: jaccard_similari
 print(" > Revisa que la oración contenga la respuesta")
 
 df_exploded['contains_ans'] = df_exploded.apply(lambda x: words_in_string(x['ans'], x['context']), axis=1)
-print(df_exploded.head(25))
+
+print(" > Obtenemos la tabla jaccard")
+
+cols_to_select = ["jaccard_similarity", "contains_ans"]
+df_j = df_exploded.loc[:, cols_to_select]
+print(df_j.head(30))
