@@ -7,24 +7,14 @@ import sys
 df = pd.read_json('data.json')
 
 print(" > Todo a lowercase")
-
 df['context'] = df['context'].apply(str.lower)
 df['questions'] = df['questions'].apply(lambda x: [e.lower() if isinstance(e, str) else e for e in x])
 df['ans'] = df['ans'].apply(lambda x: [e.lower() if isinstance(e, str) else e for e in x])
-print(df.head(10))
 
 print(" > Elimina stopwords")
 
 with open('stopwords.txt', 'r') as f:
     words = f.read().split()
-
-#def remove_list_of_words(column_to_modify, stopwords):
-#    for word in stopwords:
-#        column_to_modify = column_to_modify.replace(word, "")
-#    return column_to_modify
-#remove_list_of_words(df['context'], words)
-
-#df['context'] = remove_list_of_words(df['context'],words)
 
 def remove_words(text):
     text_words = text.split()
@@ -32,29 +22,20 @@ def remove_words(text):
     text = ' '.join(text_words)
     return text
 
-df['context'] = df['context'].apply(remove_words)
-
 def iterate_list(my_list,words):
-    # initialize an empty list
     result = []
-    # iterate over the elements in the input list
     for elem in my_list:
         if type(elem) == str:
-            #for palabra in words:
-            #elem = elem.replace(f" {palabra} ", "")
             elem = elem.replace("?"," ?")
             text_words = elem.split()
             text_words = [w for w in text_words if w not in words]
             text = ' '.join(text_words)
             result.append(text)
-    # return the modified list
     return result
 
-# apply the function to each element in the 'my_list_column' column
+df['context'] = df['context'].apply(remove_words)
 df['questions'] = df['questions'].apply(iterate_list,words=words)
 df['ans'] = df['ans'].apply(iterate_list,words=words)
-
-print(df.head(10))
 
 #aca empezamos a explotar las cosas.
 #ahora tenemos que usar para todo el exploded. please remember.
@@ -62,27 +43,25 @@ print(df.head(10))
 df['context'] = df['context'].str.split('.')
 df_exploded = df.explode('context')
 df_exploded=df_exploded.set_index(['context']).apply(pd.Series.explode).reset_index()
-print(df_exploded.head(20))
 
 def jaccard_similarity(a, b):
-    # convert to set
     a = set(a)
     b = set(b)
-    # calucate jaccard similarity
     j = float(len(a.intersection(b))) / len(a.union(b))
     return j
 
-def contains_ans(string1,string2):
-  palabras1 = string1.split()
-  palabras2 = string2.split()
-  check =  all(item in palabras1 for item in palabras2)
-  if check is True:
+def words_in_string(words, string):
+    words_list = words.split()
+    for word in words_list:
+        if word not in string:
+            return 0
     return 1
-  else :
-    return 0
 
-# Apply the function to each row of the DataFrame
+print(" > Calculamos jaccard_similarity")
+
 df_exploded['jaccard_similarity'] = df_exploded.apply(lambda x: jaccard_similarity(x['context'], x['questions']), axis=1)
-df_exploded['contains_ans'] = df_exploded.apply(lambda x: contains_ans(x['context'], x['ans']), axis=1)
-#df_exploded['contains_ans'] = df_exploded.apply(lambda x: df_exploded['context'].str.contains(df_exploded['ans']), axis=1)
+
+print(" > Revisa que la oración contenga la respuesta")
+
+df_exploded['contains_ans'] = df_exploded.apply(lambda x: words_in_string(x['ans'], x['context']), axis=1)
 print(df_exploded.head(25))
