@@ -63,3 +63,26 @@ df['context'] = df['context'].str.split('.')
 df_exploded = df.explode('context')
 df_exploded=df_exploded.set_index(['context']).apply(pd.Series.explode).reset_index()
 print(df_exploded.head(20))
+
+def jaccard_similarity(a, b):
+    # convert to set
+    a = set(a)
+    b = set(b)
+    # calucate jaccard similarity
+    j = float(len(a.intersection(b))) / len(a.union(b))
+    return j
+
+def contains_ans(string1,string2):
+  palabras1 = string1.split()
+  palabras2 = string2.split()
+  check =  all(item in palabras1 for item in palabras2)
+  if check is True:
+    return 1
+  else :
+    return 0
+
+# Apply the function to each row of the DataFrame
+df_exploded['jaccard_similarity'] = df_exploded.apply(lambda x: jaccard_similarity(x['context'], x['questions']), axis=1)
+df_exploded['contains_ans'] = df_exploded.apply(lambda x: contains_ans(x['context'], x['ans']), axis=1)
+#df_exploded['contains_ans'] = df_exploded.apply(lambda x: df_exploded['context'].str.contains(df_exploded['ans']), axis=1)
+print(df_exploded.head(25))
