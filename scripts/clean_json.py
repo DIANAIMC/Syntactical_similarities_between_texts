@@ -39,17 +39,21 @@ def iterate_list(my_list,words):
     result = []
     # iterate over the elements in the input list
     for elem in my_list:
-        #for palabra in words:
-        #elem = elem.replace(f" {palabra} ", "")
-        elem = elem.replace("?"," ?")
-        text_words = elem.split()
-        text_words = [w for w in text_words if w not in words]
-        text = ' '.join(text_words)
-        result.append(text)
+        if type(elem) == str:
+            #for palabra in words:
+            #elem = elem.replace(f" {palabra} ", "")
+            elem = elem.replace("?"," ?")
+            text_words = elem.split()
+            text_words = [w for w in text_words if w not in words]
+            text = ' '.join(text_words)
+            result.append(text)
+        else:
+            result.append(elem)
     # return the modified list
     return result
 
 # apply the function to each element in the 'my_list_column' column
 df['questions'] = df['questions'].apply(iterate_list,words=words)
+df['ans'] = df['ans'].apply(iterate_list,words=words)
 
 print(df.head(10))
