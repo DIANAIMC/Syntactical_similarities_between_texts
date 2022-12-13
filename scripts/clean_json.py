@@ -39,8 +39,15 @@ df['ans'] = df['ans'].apply(iterate_list,words=words)
 
 #aca empezamos a explotar las cosas.
 #ahora tenemos que usar para todo el exploded. please remember.
-
 df['context'] = df['context'].str.split('.')
+
+def without_spaces(my_list):
+    new_list = [x for x in my_list if x != '']
+    return new_list
+
+print(" > Elimina strings vacíos")
+
+df['context'] = df['context'].apply(without_spaces)
 df_exploded = df.explode('context')
 df_exploded=df_exploded.set_index(['context']).apply(pd.Series.explode).reset_index()
 
@@ -69,4 +76,5 @@ print(" > Obtenemos la tabla jaccard")
 
 cols_to_select = ["jaccard_similarity", "contains_ans"]
 df_j = df_exploded.loc[:, cols_to_select]
-print(df_j.head(30))
+print(df_j.head(50))
+
