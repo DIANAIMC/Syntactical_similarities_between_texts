@@ -2,21 +2,10 @@
 
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 import os
 import sys
-
-df = pd.read_json('data.json')
-
-print('\n--------------------- Preprocessing ---------------------')
-print("\n > Todo a lowercase")
-df['context'] = df['context'].apply(str.lower)
-df['questions'] = df['questions'].apply(lambda x: [e.lower() if isinstance(e, str) else e for e in x])
-df['ans'] = df['ans'].apply(lambda x: [e.lower() if isinstance(e, str) else e for e in x])
-
-print(" > Elimina stopwords")
-
-with open('stopwords.txt', 'r') as f:
-    words = f.read().split()
+import logit
 
 def remove_words(text):
     text_words = text.split()
@@ -35,23 +24,9 @@ def iterate_list(my_list,words):
             result.append(text)
     return result
 
-df['context'] = df['context'].apply(remove_words)
-df['questions'] = df['questions'].apply(iterate_list,words=words)
-df['ans'] = df['ans'].apply(iterate_list,words=words)
-
-#aca empezamos a explotar las cosas.
-#ahora tenemos que usar para todo el exploded. please remember.
-df['context'] = df['context'].str.split('.')
-
 def without_spaces(my_list):
     new_list = [x for x in my_list if x != '']
     return new_list
-
-print(" > Elimina strings vacíos")
-
-df['context'] = df['context'].apply(without_spaces)
-df_exploded = df.explode('context')
-df_exploded=df_exploded.set_index(['context']).apply(pd.Series.explode).reset_index()
 
 def jaccard_similarity(a, b):
     a = set(a)
@@ -65,6 +40,30 @@ def words_in_string(words, string):
         if word not in string:
             return 0
     return 1
+
+print('\n--------------------- Preprocessing ---------------------')
+df = pd.read_json('data.json')
+
+print("\n > Todo a lowercase")
+
+df['context'] = df['context'].apply(str.lower)
+df['questions'] = df['questions'].apply(lambda x: [e.lower() if isinstance(e, str) else e for e in x])
+df['ans'] = df['ans'].apply(lambda x: [e.lower() if isinstance(e, str) else e for e in x])
+
+print(" > Elimina stopwords")
+
+with open('stopwords.txt', 'r') as f:
+    words = f.read().split()
+df['context'] = df['context'].apply(remove_words)
+df['questions'] = df['questions'].apply(iterate_list,words=words)
+df['ans'] = df['ans'].apply(iterate_list,words=words)
+df['context'] = df['context'].str.split('.')
+
+print(" > Elimina strings vacíos")
+
+df['context'] = df['context'].apply(without_spaces)
+df_exploded = df.explode('context')
+df_exploded=df_exploded.set_index(['context']).apply(pd.Series.explode).reset_index()
 
 print(" > Calculamos jaccard_similarity")
 
@@ -80,9 +79,21 @@ cols_to_select = ["jaccard_similarity", "contains_ans"]
 df_j = df_exploded.loc[:, cols_to_select]
 
 print('\n--------------------- Model training ---------------------')
-print("\n > Tomamos una muestra")
+print("\n > Tomamos una muestra de 0.05")
 
 np.random.seed(123454321)
-sample_size = 0.05 # Sample size as a percentage of the total population
-sample = df_j.sample(frac=sample_size)
-print(sample.head(50))
+sample_size5 = 0.05 # Sample size as a percentage of the total population
+sample5 = df_j.sample(frac=sample_size5)
+sample_x5 = df_j.iloc[:,0].values.reshape(-1, 1)
+sample_y5 = df_j.iloc[:,-1].values.reshape(-1, 1)
+log5 = logit.Logit(X=sample_x5, y=sample_y5)
+print("\n > Lo entrenamos")
+log5.train()
+plt.plot(range(len(log5.logit.loss_hist)), log5.logit.loss_hist)
+plt.savefig('loss_project.png')
+#print(sample_x) # len=743554
+#print(sample_y) # len=743554
+
+#sample_size1 = 0.01 
+#sample1 = df_j.sample(frac=sample_size1)
+#print(sample.head(50))
