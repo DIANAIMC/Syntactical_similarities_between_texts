@@ -84,16 +84,23 @@ print("\n > Tomamos una muestra de 0.05")
 np.random.seed(123454321)
 sample_size5 = 0.05 # Sample size as a percentage of the total population
 sample5 = df_j.sample(frac=sample_size5)
-sample_x5 = df_j.iloc[:,0].values.reshape(-1, 1)
-sample_y5 = df_j.iloc[:,-1].values.reshape(-1, 1)
+sample_x5 = sample5.iloc[:,0].values.reshape(-1, 1)
+sample_y5 = sample5.iloc[:,-1].values.reshape(-1, 1)
 log5 = logit.Logit(X=sample_x5, y=sample_y5)
 print("\n > Lo entrenamos")
 log5.train()
-plt.plot(range(len(log5.logit.loss_hist)), log5.logit.loss_hist)
-plt.savefig('loss_project.png')
-#print(sample_x) # len=743554
-#print(sample_y) # len=743554
+plt.plot(range(len(log5.loss_hist)), log5.loss_hist)
+plt.savefig('loss_project5.png')
 
-#sample_size1 = 0.01 
-#sample1 = df_j.sample(frac=sample_size1)
-#print(sample.head(50))
+print("\n > Tomamos una muestra de 0.01")
+
+np.random.seed(123454321)
+sample_size1 = 0.01 # Sample size as a percentage of the total population
+sample1 = df_j.sample(frac=sample_size1)
+sample_x1 = sample1.iloc[:,0].values.reshape(-1, 1)
+sample_y1 = sample1.iloc[:,-1].values.reshape(-1, 1)
+log1 = logit.Logit(X=sample_x1, y=sample_y1)
+print("\n > Lo entrenamos")
+log1.train()
+plt.plot(range(len(log1.loss_hist)), log1.loss_hist)
+plt.savefig('loss_project1.png')
