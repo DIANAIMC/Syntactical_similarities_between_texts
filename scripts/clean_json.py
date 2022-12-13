@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#! /usr/bin/env python
 
 import pandas as pd
 import os
@@ -6,14 +6,14 @@ import sys
 
 df = pd.read_json('data.json')
 
-print("	> Todo a lowercase")
+print(" > Todo a lowercase")
 
 df['context'] = df['context'].apply(str.lower)
 df['questions'] = df['questions'].apply(lambda x: [e.lower() if isinstance(e, str) else e for e in x])
 df['ans'] = df['ans'].apply(lambda x: [e.lower() if isinstance(e, str) else e for e in x])
 print(df.head(10))
 
-print("	> Elimina stopwords")
+print(" > Elimina stopwords")
 
 with open('stopwords.txt', 'r') as f:
     words = f.read().split()
@@ -41,10 +41,11 @@ def iterate_list(my_list,words):
     for elem in my_list:
         #for palabra in words:
         #elem = elem.replace(f" {palabra} ", "")
+        elem = elem.replace("?"," ?")
         text_words = elem.split()
         text_words = [w for w in text_words if w not in words]
-    	text = ' '.join(text_words)
-	result.append(text)
+        text = ' '.join(text_words)
+        result.append(text)
     # return the modified list
     return result
 
