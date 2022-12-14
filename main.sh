@@ -8,8 +8,9 @@ then
 fi
 
 echo -e '\n--------------------- LIMPIEZA DE JSON ---------------------'
-echo '	>Estructura a json'
-cat $WORKING_DIR/data/train-v2.0.json | jq '[. | .data | .[] | .t=(.title) | .paragraphs | .[] | .questions=([.qas | .[] | .question]) | .ans=([.qas | .[] | .. | .text?]) | {context: .context, questions:.questions, ans:.ans}]' > $WORKING_DIR/scripts/data.json
+echo ' >Estructura a json'
+cat $WORKING_DIR/data/train-v2.0.json | jq '[. | .data | .[] | .t=(.title) | .paragraphs | .[] | .questions=([.qas | .[] | .question]) | .ans=([.qas | .[] | .. | .text?]) | {context: .context, questions:.questions, ans:.ans}]' > $WORKING_DIR/data/data.json
 
 
-#python ./scripts/clean_json.py
+python ./scripts/muestreo.py 
+ 

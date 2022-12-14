@@ -1,11 +1,13 @@
 #! /usr/bin/env python
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
 import sys
 import logit
+
+directorio_actual = os.getcwd()
+os.chdir(f'{directorio_actual}/data')
 
 def remove_words(text):
     text_words = text.split()
@@ -43,7 +45,6 @@ def words_in_string(words, string):
 
 print('\n--------------------- Preprocessing ---------------------')
 df = pd.read_json('data.json')
-
 print("\n > Todo a lowercase")
 
 df['context'] = df['context'].apply(str.lower)
@@ -79,6 +80,7 @@ cols_to_select = ["jaccard_similarity", "contains_ans"]
 df_j = df_exploded.loc[:, cols_to_select]
 
 print('\n--------------------- Model training ---------------------')
+os.chdir(f'{directorio_actual}/scripts')
 print("\n > Tomamos una muestra de 0.05")
 
 np.random.seed(123454321)
@@ -90,10 +92,11 @@ log5 = logit.Logit(X=sample_x5, y=sample_y5)
 print("\n > Lo entrenamos")
 log5.train()
 plt.plot(range(len(log5.loss_hist)), log5.loss_hist)
+os.chdir(f'{directorio_actual}/graficas')
 plt.savefig('loss_project5.png')
 
 print("\n > Tomamos una muestra de 0.01")
-
+os.chdir(f'{directorio_actual}/scripts')
 np.random.seed(123454321)
 sample_size1 = 0.01 # Sample size as a percentage of the total population
 sample1 = df_j.sample(frac=sample_size1)
@@ -103,4 +106,5 @@ log1 = logit.Logit(X=sample_x1, y=sample_y1)
 print("\n > Lo entrenamos")
 log1.train()
 plt.plot(range(len(log1.loss_hist)), log1.loss_hist)
+os.chdir(f'{directorio_actual}/graficas')
 plt.savefig('loss_project1.png')
