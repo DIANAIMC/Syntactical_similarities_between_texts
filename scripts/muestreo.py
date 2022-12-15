@@ -125,14 +125,15 @@ theta1_0_bootstrap = []
 theta1_1_bootstrap = []
 
 for _ in range(100):
-	bootstrap_sample_5 = sample5.sample(n=len(sample5), replace=True)
-	bootstrap_5x = bootstrap_sample['jaccard_similarity']
-	bootstrap_5y = bootstrap_sample['contains_ans']
-	log5_b = logit.Logit(X=bootstrap_5x, y=bootstrap_5y)
-	log5_b.train()
-	theta5_0_b=log5_b.theta[0][0]
-	theta5_0_bootstrap.append(theta5_0_b)
-	theta5_1_b=log5_b.theta[0][1]
+        bootstrap_sample_5 = sample5.sample(n=len(sample5), replace=True)
+        bootstrap_5x = bootstrap_sample['jaccard_similarity']
+        bootstrap_5y = bootstrap_sample['contains_ans']
+        log5_b = logit.Logit(X=bootstrap_5x, y=bootstrap_5y)
+        log5_b.train()
+        theta5_0_b=log5_b.theta[0][0]
+        theta5_0_bootstrap.append(theta5_0_b)
+        theta5_1_b=log5_b.theta[0][1]
         theta5_1_bootstrap.append(theta5_1_b)
 
-print(theta5_0_bootstrap))
+print(theta5_0_bootstrap)
+
