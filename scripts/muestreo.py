@@ -108,3 +108,31 @@ log1.train()
 plt.plot(range(len(log1.loss_hist)), log1.loss_hist)
 os.chdir(f'{directorio_actual}/graficas')
 plt.savefig('loss_project1.png')
+
+#print(log5.theta[0][0])
+#print(log1.theta[0][1])
+
+bootstrap_samples_5 = [np.random.choice(sample5, size=len(sample5), replace=True) for _ in range(100)]
+print(bootstrap_samples_5)
+sample_x5_bootstrap = [bootstrap_samples.iloc[:,0].values.reshape(-1, 1)]
+sample_y5_bootstrap = [bootstrap_samples.iloc[:,-1].values.reshape(-1, 1)]
+
+bootstrap_samples_1 = [np.random.choice(sample1, size=len(sample1), replace=True) for _ in range(100)]
+print(bootstrap_samples_1)
+sample_x1_bootstrap = [bootstrap_samples.iloc[:,0].values.reshape(-1, 1)]
+sample_y1_bootstrap = [bootstrap_samples.iloc[:,-1].values.reshape(-1, 1)]
+
+theta_0 = []
+theta_1 = []
+
+for i in bootstrapsamples_5:
+    lg5 = logit.Logit(X=sample_x5_bootstrap[i], Y=sample_y5_boostrap[i])
+    lg5.train()
+    theta_0.append(lg.theta[0][0])
+    theta_1.append(lg.theta[0][1])
+    
+for i in bootstrapsamples_1:
+    lg1 = logit.Logit(X=sample_x1_bootstrap[i], Y=sample_y1_bootstrap[i])
+    lg1.train()
+    theta_0.append(lg.theta[0][0])
+    theta_1.append(lg.theta[0][1])
