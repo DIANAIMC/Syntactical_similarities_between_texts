@@ -146,28 +146,24 @@ if __name__ == "__main__":
 
     print("\n > Obtenemos bootstrap´s")
 
-    theta5_0_bootstrap = []
-    theta5_1_bootstrap = []
-
-    theta1_0_bootstrap = []
-    theta1_1_bootstrap = []
+    theta_0_bootstrap = []
+    theta_1_bootstrap = []
 
     # Define the list of bootstrap samples
-    bootstrap_sample_5 = [sample5.sample(n=len(sample5), replace=True) for _ in range(100)]
+    bootstrap_sample_1 = [sample1.sample(n=len(sample1), replace=True) for _ in range(100)]
     # Train the models using 2 processes
     # results=parallel_train(bootstrap_sample_5, 4)
     results=[]
-    pool=multiprocessing.Pool(processes=10)
-    for rep in bootstrap_sample_5:
+    pool=multiprocessing.Pool(processes=100)
+    for rep in bootstrap_sample_1:
         pool.apply_async(train_model,[rep],callback=append_results)
     pool.close()
     pool.join()
     for thetas in results:
-        theta5_0_bootstrap.append(thetas[0])
-        theta5_1_bootstrap.append(thetas[1])
-    print("Sin filtrar")
-    print(theta5_0_bootstrap)
-    print(theta5_0_bootstrap)
+        theta_0_bootstrap.append(thetas[0])
+        theta_1_bootstrap.append(thetas[1])
+
+    """
     quantile_975 = np.quantile(theta5_0_bootstrap, 0.975)
     quantile_025 = np.quantile(theta5_0_bootstrap, 0.025)
     theta_confidence95_0 = np.where((theta5_0_bootstrap < quantile_975) & (theta5_0_bootstrap > quantile_025), theta5_0_bootstrap, np.nan)
@@ -179,48 +175,48 @@ if __name__ == "__main__":
     theta_confidence95_1 = np.where((theta5_1_bootstrap < quantile_975) & (theta5_1_bootstrap > quantile_025), theta5_1_bootstrap, np.nan)
     theta_confidence95_1 = np.nan_to_num(theta_confidence95_1)
     theta_confidence95_1 = [x for x in theta_confidence95_1 if x != 0]
-
-    print("Filtrados")
-    print(theta_confidence95_0)
-    print(theta_confidence95_1)
-
+    """
     print("\n > Obtenemos las gráficas")
     #theta 0
     os.chdir(f'{directorio_actual}/graficas')
-    x=np.linspace(0, 100, len(theta5_0_bootstrap))
-    y=theta5_0_bootstrap 
+    x=np.linspace(0, 100, len(theta_0_bootstrap))
+    y=theta_0_bootstrap 
 
-    p5 = np.percentile(theta5_0_bootstrap, 5)
-    p95 = np.percentile(theta5_0_bootstrap, 95)
+    p5 = np.percentile(theta_0_bootstrap, 5)
+    p95 = np.percentile(theta_0_bootstrap, 95)
+    plt.clf()
     plt.plot(x, y, 'o')
-    for i, val in enumerate(theta5_0_bootstrap):
+    for i, val in enumerate(theta_0_bootstrap):
         if val <= p5:
             plt.scatter(i, val, color='red')
         elif val>=p95:
             plt.scatter(i, val, color='red')
             
-    plt.axhline(y = np.percentile(theta5_0_bootstrap, 5), color = 'r', label = 'axvline - full height')
-    plt.axhline(y = np.percentile(theta5_0_bootstrap, 95), color = 'r', label = 'axvline - full height')
+    plt.axhline(y = np.percentile(theta_0_bootstrap, 5), color = 'r', label = 'axvline - full height')
+    plt.axhline(y = np.percentile(theta_0_bootstrap, 95), color = 'r', label = 'axvline - full height')
     #theta 1
-    x=np.linspace(0, 100, len(theta5_1_bootstrap))
-    y=theta5_1_bootstrap 
+    """
+    x=np.linspace(0, 100, len(theta_1_bootstrap))
+    y=theta_1_bootstrap 
 
-    p5 = np.percentile(theta5_1_bootstrap, 5)
-    p95 = np.percentile(theta5_1_bootstrap, 95)
+    p5 = np.percentile(theta_1_bootstrap, 5)
+    p95 = np.percentile(theta_1_bootstrap, 95)
     plt.plot(x, y, 'o')
-    for i, val in enumerate(theta5_1_bootstrap):
+    for i, val in enumerate(theta_1_bootstrap):
         if val <= p5:
             plt.scatter(i, val, color='yellow')
         elif val>=p95:
             plt.scatter(i, val, color='yellow')
             
-    plt.axhline(y = np.percentile(theta5_1_bootstrap, 5), color = 'y', label = 'axvline - full height')
-    plt.axhline(y = np.percentile(theta5_1_bootstrap, 95), color = 'y', label = 'axvline - full height')
-    plt.savefig("Scatter_theta_5.png")
-
+    plt.axhline(y = np.percentile(theta_1_bootstrap, 5), color = 'y', label = 'axvline - full height')
+    plt.axhline(y = np.percentile(theta_1_bootstrap, 95), color = 'y', label = 'axvline - full height')
+    """
+    plt.savefig("Scatter_theta_1.png")
+    
     #PARA LA NORMALIZADA Y DISTRIBUCION
-    desviacion = statistics.stdev(theta5_0_bootstrap)
-    media = statistics.mean(theta5_0_bootstrap)
+    plt.clf()
+    desviacion = statistics.stdev(theta_0_bootstrap)
+    media = statistics.mean(theta_0_bootstrap)
     ci = norm.interval(0.95, loc=media, scale=desviacion)
 
     x_norm = np.linspace(media - 3*desviacion, media + 3*desviacion, 100)
@@ -228,9 +224,9 @@ if __name__ == "__main__":
     plt.plot(x_norm, y_norm)
     plt.axvline(x = np.percentile(x_norm, 5), color = 'r', label = 'axvline - full height')
     plt.axvline(x = np.percentile(x_norm, 95), color = 'r', label = 'axvline - full height')
-
-    desviacion = statistics.stdev(theta5_1_bootstrap)
-    media = statistics.mean(theta5_1_bootstrap)
+    """
+    desviacion = statistics.stdev(theta_1_bootstrap)
+    media = statistics.mean(theta_1_bootstrap)
     ci = norm.interval(0.95, loc=media, scale=desviacion)
 
     x_norm = np.linspace(media - 3*desviacion, media + 3*desviacion, 100)
@@ -238,4 +234,6 @@ if __name__ == "__main__":
     plt.plot(x_norm, y_norm)
     plt.axvline(x = np.percentile(x_norm, 5), color = 'b', label = 'axvline - full height')
     plt.axvline(x = np.percentile(x_norm, 95), color = 'b', label = 'axvline - full height')
-    plt.savefig("Distribucion_theta_5.png")
+    """
+    plt.savefig("Distribucion_theta_1.png")
+    
