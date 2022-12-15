@@ -50,7 +50,7 @@ class Logit:
             loss = np.Inf
             #print(iters)
             while(loss > tol and iters < max_iter):
-                  print('.', end='', flush=True)
+                  #print('.', end='', flush=True)
                   loss = self.loss()
                   if not iters % 500:
                         print(f'\nloss: {loss}')

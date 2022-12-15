@@ -109,30 +109,30 @@ plt.plot(range(len(log1.loss_hist)), log1.loss_hist)
 os.chdir(f'{directorio_actual}/graficas')
 plt.savefig('loss_project1.png')
 
-#print(log5.theta[0][0])
-#print(log1.theta[0][1])
+print("\n > Almacenamos theta´s")
+theta5_0=log5.theta[0][0]
+theta5_1=log5.theta[0][1]
 
-bootstrap_samples_5 = [np.random.choice(sample5, size=len(sample5), replace=True) for _ in range(100)]
-print(bootstrap_samples_5)
-sample_x5_bootstrap = [bootstrap_samples.iloc[:,0].values.reshape(-1, 1)]
-sample_y5_bootstrap = [bootstrap_samples.iloc[:,-1].values.reshape(-1, 1)]
+theta1_0=log1.theta[0][0]
+theta1_1=log1.theta[0][1]
 
-bootstrap_samples_1 = [np.random.choice(sample1, size=len(sample1), replace=True) for _ in range(100)]
-print(bootstrap_samples_1)
-sample_x1_bootstrap = [bootstrap_samples.iloc[:,0].values.reshape(-1, 1)]
-sample_y1_bootstrap = [bootstrap_samples.iloc[:,-1].values.reshape(-1, 1)]
+print("\n > Obtenemos bootstrap´s")
 
-theta_0 = []
-theta_1 = []
+theta5_0_bootstrap = []
+theta5_1_bootstrap = []
 
-for i in bootstrapsamples_5:
-    lg5 = logit.Logit(X=sample_x5_bootstrap[i], Y=sample_y5_boostrap[i])
-    lg5.train()
-    theta_0.append(lg.theta[0][0])
-    theta_1.append(lg.theta[0][1])
-    
-for i in bootstrapsamples_1:
-    lg1 = logit.Logit(X=sample_x1_bootstrap[i], Y=sample_y1_bootstrap[i])
-    lg1.train()
-    theta_0.append(lg.theta[0][0])
-    theta_1.append(lg.theta[0][1])
+theta1_0_bootstrap = []
+theta1_1_bootstrap = []
+
+for _ in range(100):
+	bootstrap_sample_5 = sample5.sample(n=len(sample5), replace=True)
+	bootstrap_5x = bootstrap_sample['jaccard_similarity']
+	bootstrap_5y = bootstrap_sample['contains_ans']
+	log5_b = logit.Logit(X=bootstrap_5x, y=bootstrap_5y)
+	log5_b.train()
+	theta5_0_b=log5_b.theta[0][0]
+	theta5_0_bootstrap.append(theta5_0_b)
+	theta5_1_b=log5_b.theta[0][1]
+        theta5_1_bootstrap.append(theta5_1_b)
+
+print(theta5_0_bootstrap))
