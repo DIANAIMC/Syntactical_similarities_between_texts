@@ -45,15 +45,15 @@ class Logit:
             p = self.forward()
             return -np.mean(self.y*np.log(p) + (1-self.y)*np.log(1-p))
 
-      def train(self, tol=1e-5, max_iter=3000):
+      def train(self, tol=1e-5, max_iter=10000):
             iters = 0
             loss = np.Inf
             #print(iters)
             while(loss > tol and iters < max_iter):
                   #print('.', end='', flush=True)
                   loss = self.loss()
-                  if not iters % 500:
-                        print(f'\nloss: {loss}')
+                  #if not iters % 500:
+                        #print(f'\nloss: {loss}')
                   p = self.forward().reshape(-1, 1)
                   self.theta -= -self.alpha*np.mean((self.y - p)*self.X, axis=0)
                   iters += 1
