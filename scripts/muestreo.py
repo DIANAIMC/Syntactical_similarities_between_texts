@@ -175,10 +175,10 @@ if __name__ == "__main__":
     plt.rcParams["figure.figsize"] = (20,10)
     fig, (ax1, ax2) = plt.subplots(1, 2)
     fig.suptitle('Theta 0 vs Theta 1')
-    x=np.linspace(0, 25, len(theta_0_bootstrap))
+    x=np.linspace(0, 100, len(theta_0_bootstrap))
     y=theta_0_bootstrap 
     ax1.plot(x, y, 'o')
-    x=np.linspace(0, 25, len(theta_1_bootstrap))
+    x=np.linspace(0, 100, len(theta_1_bootstrap))
     y=theta_1_bootstrap 
     ax2.plot(x, y, 'o')
 
@@ -187,7 +187,9 @@ if __name__ == "__main__":
             ax1.scatter(i, val, color='red')
         elif val>=p95:
             ax1.scatter(i, val, color='red')
-            
+    p5 = np.percentile(theta_1_bootstrap, 5)
+    p95 = np.percentile(theta_1_bootstrap, 95)
+
     ax1.axhline(y = np.percentile(theta_0_bootstrap, 5), color = 'r', label = 'axvline - full height')
     ax1.axhline(y = np.percentile(theta_0_bootstrap, 95), color = 'r', label = 'axvline - full height')
     #theta 1
@@ -205,11 +207,11 @@ if __name__ == "__main__":
     plt.clf()
     desviacion_0 = statistics.stdev(theta_0_bootstrap)
     media_0 = statistics.mean(theta_0_bootstrap)
-    ci_0 = stats.norm.interval(0.95, loc=media_0, scale=desviacion_0)
+    ci_0 = norm.interval(0.95, loc=media_0, scale=desviacion_0)
 
     desviacion_1 = statistics.stdev(theta_1_bootstrap)
     media_1 = statistics.mean(theta_1_bootstrap)
-    ci_1 = stats.norm.interval(0.95, loc=media_1, scale=desviacion_1)
+    ci_1 = norm.interval(0.95, loc=media_1, scale=desviacion_1)
 
 
     x_norm_0 = np.linspace(media_0 - 3*desviacion_0, media_0 + 3*desviacion_0, 100)
@@ -226,8 +228,51 @@ if __name__ == "__main__":
     ax1.axvline(x = np.percentile(x_norm_0, 95), color = 'r', label = 'axvline - full height')
     ax2.axvline(x = np.percentile(x_norm_1, 5), color = 'r', label = 'axvline - full height')
     ax2.axvline(x = np.percentile(x_norm_1, 95), color = 'r', label = 'axvline - full height')
-    plt.savefig("Distribucion_theta_1.png")
-    """
+    plt.savefig("Distribucion_normalizada_1.png")
+
+    #DISTRIBUCION
+    plt.clf()
+    fig, (ax1, ax2) = plt.subplots(1, 2)
+    fig.suptitle('Theta 0 vs Theta 1')
+    #x=np.linspace(0, 100, len(theta_0_bootstrap))
+    #y=theta_0_bootstrap 
+    #ax1.plot(x, y, 'o')
+    df = pd.DataFrame(theta_0_bootstrap)
+    df.plot.kde(ax=ax1)
+
+    p5 = np.percentile(theta_0_bootstrap, 5)
+    p95 = np.percentile(theta_0_bootstrap, 95)
+
+    #for i, val in enumerate(theta_0_bootstrap):
+    #    if val <= p5:
+    #        ax1.scatter(i, val, color='red')
+    #    elif val>=p95:
+    #        ax1.scatter(i, val, color='red')
+    
+    ax1.axvline(x = np.percentile(theta_0_bootstrap, 5), color = 'r', label = 'axvline - full height')
+    ax1.axvline(x = np.percentile(theta_0_bootstrap, 95), color = 'r', label = 'axvline - full height')
+
+    #x=np.linspace(0, 100, len(theta_1_bootstrap))
+    #y=theta_1_bootstrap 
+    #ax2.plot(x, y, 'o')
+    df = pd.DataFrame(theta_1_bootstrap)
+    df.plot.kde(ax=ax2)
+
+    p5 = np.percentile(theta_1_bootstrap, 5)
+    p95 = np.percentile(theta_1_bootstrap, 95)
+
+    #for i, val in enumerate(theta_1_bootstrap):
+    #    if val <= p5:
+    #        ax2.scatter(i, val, color='yellow')
+    #    elif val>=p95:
+    #        ax2.scatter(i, val, color='yellow')
+
+    ax2.axvline(x = np.percentile(theta_1_bootstrap, 5), color = 'r', label = 'axvline - full height')
+    ax2.axvline(x = np.percentile(theta_1_bootstrap, 95), color = 'r', label = 'axvline - full height')
+
+    plt.savefig("Distribucion_1.png")
+    
+    
     print("\n   > Obtenemos bootstrap´s de 5%")
 
     theta_0_bootstrap = []
@@ -250,59 +295,112 @@ if __name__ == "__main__":
     print("\n   > Obtenemos las gráficas")
     #theta 0
     os.chdir(f'{directorio_actual}/graficas')
+    print("\n 	> Obtenemos las gráficas")
+    #theta 0
+    os.chdir(f'{directorio_actual}/graficas')
     x=np.linspace(0, 100, len(theta_0_bootstrap))
-    y=theta_0_bootstrap
+    y=theta_0_bootstrap 
 
     p5 = np.percentile(theta_0_bootstrap, 5)
     p95 = np.percentile(theta_0_bootstrap, 95)
     plt.clf()
-    plt.plot(x, y, 'o')
+    plt.rcParams["figure.figsize"] = (20,10)
+    fig, (ax1, ax2) = plt.subplots(1, 2)
+    fig.suptitle('Theta 0 vs Theta 1')
+    x=np.linspace(0, 100, len(theta_0_bootstrap))
+    y=theta_0_bootstrap 
+    ax1.plot(x, y, 'o')
+    x=np.linspace(0, 100, len(theta_1_bootstrap))
+    y=theta_1_bootstrap 
+    ax2.plot(x, y, 'o')
+
     for i, val in enumerate(theta_0_bootstrap):
         if val <= p5:
-            plt.scatter(i, val, color='red')
+            ax1.scatter(i, val, color='red')
         elif val>=p95:
-            plt.scatter(i, val, color='red')
+            ax1.scatter(i, val, color='red')
+    p5 = np.percentile(theta_1_bootstrap, 5)
+    p95 = np.percentile(theta_1_bootstrap, 95)
 
-    plt.axhline(y = np.percentile(theta_0_bootstrap, 5), color = 'r', label = 'axvline - full height')
-    plt.axhline(y = np.percentile(theta_0_bootstrap, 95), color = 'r', label = 'axvline - full height')
+    ax1.axhline(y = np.percentile(theta_0_bootstrap, 5), color = 'r', label = 'axvline - full height')
+    ax1.axhline(y = np.percentile(theta_0_bootstrap, 95), color = 'r', label = 'axvline - full height')
     #theta 1
-    x=np.linspace(0, 100, len(theta_1_bootstrap))
-    y=theta_1_bootstrap
+    for i, val in enumerate(theta_1_bootstrap):
+        if val <= p5:
+            ax2.scatter(i, val, color='yellow')
+        elif val>=p95:
+            ax2.scatter(i, val, color='yellow')
+
+    ax2.axhline(y = np.percentile(theta_1_bootstrap, 5), color = 'r', label = 'axvline - full height')
+    ax2.axhline(y = np.percentile(theta_1_bootstrap, 95), color = 'r', label = 'axvline - full height')
+    plt.savefig("Scatter_theta_5.png")
+    
+    #PARA LA NORMALIZADA Y DISTRIBUCION
+    plt.clf()
+    desviacion_0 = statistics.stdev(theta_0_bootstrap)
+    media_0 = statistics.mean(theta_0_bootstrap)
+    ci_0 = norm.interval(0.95, loc=media_0, scale=desviacion_0)
+
+    desviacion_1 = statistics.stdev(theta_1_bootstrap)
+    media_1 = statistics.mean(theta_1_bootstrap)
+    ci_1 = norm.interval(0.95, loc=media_1, scale=desviacion_1)
+
+
+    x_norm_0 = np.linspace(media_0 - 3*desviacion_0, media_0 + 3*desviacion_0, 100)
+    y_norm_0 = norm.pdf(x_norm_0, media_0, desviacion_0)
+    x_norm_1 = np.linspace(media_1 - 3*desviacion_1, media_1 + 3*desviacion_1, 100)
+    y_norm_1 = norm.pdf(x_norm_1, media_1, desviacion_1)
+
+    plt.rcParams["figure.figsize"] = (20,10)
+    fig, (ax1, ax2) = plt.subplots(1, 2)
+    fig.suptitle('Distribucion Theta 0 vs Theta 1')
+    ax1.plot(x_norm_0, y_norm_0)
+    ax2.plot(x_norm_1, y_norm_1)
+    ax1.axvline(x = np.percentile(x_norm_0, 5), color = 'r', label = 'axvline - full height')
+    ax1.axvline(x = np.percentile(x_norm_0, 95), color = 'r', label = 'axvline - full height')
+    ax2.axvline(x = np.percentile(x_norm_1, 5), color = 'r', label = 'axvline - full height')
+    ax2.axvline(x = np.percentile(x_norm_1, 95), color = 'r', label = 'axvline - full height')
+    plt.savefig("Distribucion_normalizada_5.png")
+
+    #DISTRIBUCION
+    plt.clf()
+    fig, (ax1, ax2) = plt.subplots(1, 2)
+    fig.suptitle('Theta 0 vs Theta 1')
+    #x=np.linspace(0, 100, len(theta_0_bootstrap))
+    #y=theta_0_bootstrap 
+    #ax1.plot(x, y, 'o')
+    df = pd.DataFrame(theta_0_bootstrap)
+    df.plot.kde(ax=ax1)
+
+    p5 = np.percentile(theta_0_bootstrap, 5)
+    p95 = np.percentile(theta_0_bootstrap, 95)
+
+    #for i, val in enumerate(theta_0_bootstrap):
+    #    if val <= p5:
+    #        ax1.scatter(i, val, color='red')
+    #    elif val>=p95:
+    #        ax1.scatter(i, val, color='red')
+    
+    ax1.axvline(x = np.percentile(theta_0_bootstrap, 5), color = 'r', label = 'axvline - full height')
+    ax1.axvline(x = np.percentile(theta_0_bootstrap, 95), color = 'r', label = 'axvline - full height')
+
+    #x=np.linspace(0, 100, len(theta_1_bootstrap))
+    #y=theta_1_bootstrap 
+    #ax2.plot(x, y, 'o')
+    df = pd.DataFrame(theta_1_bootstrap)
+    df.plot.kde(ax=ax2)
 
     p5 = np.percentile(theta_1_bootstrap, 5)
     p95 = np.percentile(theta_1_bootstrap, 95)
-    plt.plot(x, y, 'o')
-    for i, val in enumerate(theta_1_bootstrap):
-        if val <= p5:
-            plt.scatter(i, val, color='yellow')
-        elif val>=p95:
-            plt.scatter(i, val, color='yellow')
 
-    plt.axhline(y = np.percentile(theta_1_bootstrap, 5), color = 'y', label = 'axvline - full height')
-    plt.axhline(y = np.percentile(theta_1_bootstrap, 95), color = 'y', label = 'axvline - full height')
+    #for i, val in enumerate(theta_1_bootstrap):
+    #    if val <= p5:
+    #        ax2.scatter(i, val, color='yellow')
+    #    elif val>=p95:
+    #        ax2.scatter(i, val, color='yellow')
 
-    plt.savefig("Scatter_theta_5.png")
+    ax2.axvline(x = np.percentile(theta_1_bootstrap, 5), color = 'r', label = 'axvline - full height')
+    ax2.axvline(x = np.percentile(theta_1_bootstrap, 95), color = 'r', label = 'axvline - full height')
 
-    #PARA LA NORMALIZADA Y DISTRIBUCION
-    plt.clf()
-    desviacion = statistics.stdev(theta_0_bootstrap)
-    media = statistics.mean(theta_0_bootstrap)
-    ci = norm.interval(0.95, loc=media, scale=desviacion)
-
-    x_norm = np.linspace(media - 3*desviacion, media + 3*desviacion, 100)
-    y_norm = norm.pdf(x_norm, media, desviacion)
-    plt.plot(x_norm, y_norm)
-    plt.axvline(x = np.percentile(x_norm, 5), color = 'r', label = 'axvline - full height')
-    plt.axvline(x = np.percentile(x_norm, 95), color = 'r', label = 'axvline - full height')
-
-    desviacion = statistics.stdev(theta_1_bootstrap)
-    media = statistics.mean(theta_1_bootstrap)
-    ci = norm.interval(0.95, loc=media, scale=desviacion)
-
-    x_norm = np.linspace(media - 3*desviacion, media + 3*desviacion, 100)
-    y_norm = norm.pdf(x_norm, media, desviacion)
-    plt.plot(x_norm, y_norm)
-    plt.axvline(x = np.percentile(x_norm, 5), color = 'b', label = 'axvline - full height')
-    plt.axvline(x = np.percentile(x_norm, 95), color = 'b', label = 'axvline - full height')
-    plt.savefig("Distribucion_theta_5.png")
-    """
+    plt.savefig("Distribucion_5.png")
+    
