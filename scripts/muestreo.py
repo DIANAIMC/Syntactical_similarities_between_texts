@@ -2,9 +2,11 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import multiprocessing
 import os
 import sys
 import logit
+
 
 directorio_actual = os.getcwd()
 os.chdir(f'{directorio_actual}/data')
@@ -124,8 +126,6 @@ theta5_1_bootstrap = []
 theta1_0_bootstrap = []
 theta1_1_bootstrap = []
 
-import multiprocessing
-
 # Define the function that trains a logistic regression model
 def train_model(bootstrap_sample):
     bootstrap_5x = bootstrap_sample['jaccard_similarity'].values.reshape(-1, 1)
@@ -145,11 +145,35 @@ def parallel_train(bootstrap_sample_5, num_processes):
         return results
 
 # Define the list of bootstrap samples
-bootstrap_sample_5 = [sample5.sample(n=len(sample5), replace=True) for _ in range(100)]
+bootstrap_sample_5 = [sample5.sample(n=len(sample5), replace=True) for _ in range(25)]
 
 # Train the models using 2 processes
-results = parallel_train(bootstrap_sample_5, 5)
+results = parallel_train(bootstrap_sample_5, 4)
 
-# Print the results
-print(results)
+for thetas in results:
+    theta5_0_bootstrap.append(thetas[0])
+    theta5_1_bootstrap.append(thetas[1])
 
+print("Sin filtrar")
+print(theta5_0_bootstrap)
+print(theta5_0_bootstrap)
+
+quantile_975 = np.quantile(theta5_0_bootstrap, 0.975)
+quantile_025 = np.quantile(theta5_0_bootstrap, 0.025)
+theta_confidence95_0 = np.where((theta5_0_bootstrap < quantile_975) & (theta5_0_bootstrap > quantile_025), theta5_0_bootstrap, np.nan)
+theta_confidence95_0 = np.nan_to_num(theta_confidence95_0)
+theta_confidence95_0 = [x for x in theta_confidence95_0 if x != 0]
+
+quantile_975 = np.quantile(theta5_1_bootstrap, 0.975)
+quantile_025 = np.quantile(theta5_1_bootstrap, 0.025)
+theta_confidence95_1 = np.where((theta5_1_bootstrap < quantile_975) & (theta5_1_bootstrap > quantile_025), theta5_1_bootstrap, np.nan)
+theta_confidence95_1 = np.nan_to_num(theta_confidence95_1)
+theta_confidence95_1 = [x for x in theta_confidence95_1 if x != 0]
+
+print("Filtrados")
+print(theta_confidence95_0)
+print(theta_confidence95_1)
+
+#plt.scatter(range(len()), log1.loss_hist)
+#os.chdir(f'{directorio_actual}/graficas')
+#plt.savefig('confidence_interval_5.png')
