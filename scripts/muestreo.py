@@ -124,16 +124,32 @@ theta5_1_bootstrap = []
 theta1_0_bootstrap = []
 theta1_1_bootstrap = []
 
-for _ in range(100):
-        bootstrap_sample_5 = sample5.sample(n=len(sample5), replace=True)
-        bootstrap_5x = bootstrap_sample['jaccard_similarity']
-        bootstrap_5y = bootstrap_sample['contains_ans']
-        log5_b = logit.Logit(X=bootstrap_5x, y=bootstrap_5y)
-        log5_b.train()
-        theta5_0_b=log5_b.theta[0][0]
-        theta5_0_bootstrap.append(theta5_0_b)
-        theta5_1_b=log5_b.theta[0][1]
-        theta5_1_bootstrap.append(theta5_1_b)
+import multiprocessing
 
-print(theta5_0_bootstrap)
+# Define the function that trains a logistic regression model
+def train_model(bootstrap_sample):
+    bootstrap_5x = bootstrap_sample['jaccard_similarity'].values.reshape(-1, 1)
+    bootstrap_5y = bootstrap_sample['contains_ans'].values.reshape(-1, 1)
+    log5_b = logit.Logit(X=bootstrap_5x, y=bootstrap_5y)
+    log5_b.train()
+    return (log5_b.theta[0][0], log5_b.theta[0][1])
+
+# Define the main function that uses multiple processes to train the models
+def parallel_train(bootstrap_sample_5, num_processes):
+    # Create a pool of processes
+    with multiprocessing.Pool(num_processes) as pool:
+        # Use the pool of processes to train a model for each bootstrap sample
+        results = pool.map(train_model, bootstrap_sample_5)
+
+        # Return the list of results
+        return results
+
+# Define the list of bootstrap samples
+bootstrap_sample_5 = [sample5.sample(n=len(sample5), replace=True) for _ in range(100)]
+
+# Train the models using 2 processes
+results = parallel_train(bootstrap_sample_5, 7)
+
+# Print the results
+print(results)
 
