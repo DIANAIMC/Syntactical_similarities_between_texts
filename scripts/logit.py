@@ -15,7 +15,7 @@ class Logit:
       np.dot(X, theta.T)
       
       ''' 
-      def __init__(self, X, y, alpha=.005):
+      def __init__(self, X, y, alpha=.01):
             self.X = self.add_ordinate(X)
             self.y = y
             self.theta = np.random.rand(X.shape[1]+1).reshape(1, -1)
@@ -45,7 +45,7 @@ class Logit:
             p = self.forward()
             return -np.mean(self.y*np.log(p) + (1-self.y)*np.log(1-p))
 
-      def train(self, tol=1e-5, max_iter=10000):
+      def train(self, tol=1e-2, max_iter=7500):
             iters = 0
             loss = np.Inf
             #print(iters)

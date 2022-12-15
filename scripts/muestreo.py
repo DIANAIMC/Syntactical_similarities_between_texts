@@ -148,7 +148,7 @@ def parallel_train(bootstrap_sample_5, num_processes):
 bootstrap_sample_5 = [sample5.sample(n=len(sample5), replace=True) for _ in range(100)]
 
 # Train the models using 2 processes
-results = parallel_train(bootstrap_sample_5, 7)
+results = parallel_train(bootstrap_sample_5, 5)
 
 # Print the results
 print(results)
