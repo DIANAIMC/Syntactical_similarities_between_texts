@@ -143,8 +143,8 @@ if __name__ == "__main__":
 
     theta1_0=log1.theta[0][0]
     theta1_1=log1.theta[0][1]
-
-    print("\n > Obtenemos bootstrap´s")
+    print("\n > Bootstrap´s")
+    print("\n 	> Obtenemos bootstrap´s de 1%")
 
     theta_0_bootstrap = []
     theta_1_bootstrap = []
@@ -154,7 +154,7 @@ if __name__ == "__main__":
     # Train the models using 2 processes
     # results=parallel_train(bootstrap_sample_5, 4)
     results=[]
-    pool=multiprocessing.Pool(processes=100)
+    pool=multiprocessing.Pool(processes=10)
     for rep in bootstrap_sample_1:
         pool.apply_async(train_model,[rep],callback=append_results)
     pool.close()
@@ -163,24 +163,95 @@ if __name__ == "__main__":
         theta_0_bootstrap.append(thetas[0])
         theta_1_bootstrap.append(thetas[1])
 
-    """
-    quantile_975 = np.quantile(theta5_0_bootstrap, 0.975)
-    quantile_025 = np.quantile(theta5_0_bootstrap, 0.025)
-    theta_confidence95_0 = np.where((theta5_0_bootstrap < quantile_975) & (theta5_0_bootstrap > quantile_025), theta5_0_bootstrap, np.nan)
-    theta_confidence95_0 = np.nan_to_num(theta_confidence95_0)
-    theta_confidence95_0 = [x for x in theta_confidence95_0 if x != 0]
-
-    quantile_975 = np.quantile(theta5_1_bootstrap, 0.975)
-    quantile_025 = np.quantile(theta5_1_bootstrap, 0.025)
-    theta_confidence95_1 = np.where((theta5_1_bootstrap < quantile_975) & (theta5_1_bootstrap > quantile_025), theta5_1_bootstrap, np.nan)
-    theta_confidence95_1 = np.nan_to_num(theta_confidence95_1)
-    theta_confidence95_1 = [x for x in theta_confidence95_1 if x != 0]
-    """
-    print("\n > Obtenemos las gráficas")
+    print("\n 	> Obtenemos las gráficas")
     #theta 0
     os.chdir(f'{directorio_actual}/graficas')
     x=np.linspace(0, 100, len(theta_0_bootstrap))
     y=theta_0_bootstrap 
+
+    p5 = np.percentile(theta_0_bootstrap, 5)
+    p95 = np.percentile(theta_0_bootstrap, 95)
+    plt.clf()
+    plt.rcParams["figure.figsize"] = (20,10)
+    fig, (ax1, ax2) = plt.subplots(1, 2)
+    fig.suptitle('Theta 0 vs Theta 1')
+    x=np.linspace(0, 25, len(theta_0_bootstrap))
+    y=theta_0_bootstrap 
+    ax1.plot(x, y, 'o')
+    x=np.linspace(0, 25, len(theta_1_bootstrap))
+    y=theta_1_bootstrap 
+    ax2.plot(x, y, 'o')
+
+    for i, val in enumerate(theta_0_bootstrap):
+        if val <= p5:
+            ax1.scatter(i, val, color='red')
+        elif val>=p95:
+            ax1.scatter(i, val, color='red')
+            
+    ax1.axhline(y = np.percentile(theta_0_bootstrap, 5), color = 'r', label = 'axvline - full height')
+    ax1.axhline(y = np.percentile(theta_0_bootstrap, 95), color = 'r', label = 'axvline - full height')
+    #theta 1
+    for i, val in enumerate(theta_1_bootstrap):
+        if val <= p5:
+            ax2.scatter(i, val, color='yellow')
+        elif val>=p95:
+            ax2.scatter(i, val, color='yellow')
+
+    ax2.axhline(y = np.percentile(theta_1_bootstrap, 5), color = 'r', label = 'axvline - full height')
+    ax2.axhline(y = np.percentile(theta_1_bootstrap, 95), color = 'r', label = 'axvline - full height')
+    plt.savefig("Scatter_theta_1.png")
+    
+    #PARA LA NORMALIZADA Y DISTRIBUCION
+    plt.clf()
+    desviacion_0 = statistics.stdev(theta_0_bootstrap)
+    media_0 = statistics.mean(theta_0_bootstrap)
+    ci_0 = stats.norm.interval(0.95, loc=media_0, scale=desviacion_0)
+
+    desviacion_1 = statistics.stdev(theta_1_bootstrap)
+    media_1 = statistics.mean(theta_1_bootstrap)
+    ci_1 = stats.norm.interval(0.95, loc=media_1, scale=desviacion_1)
+
+
+    x_norm_0 = np.linspace(media_0 - 3*desviacion_0, media_0 + 3*desviacion_0, 100)
+    y_norm_0 = norm.pdf(x_norm_0, media_0, desviacion_0)
+    x_norm_1 = np.linspace(media_1 - 3*desviacion_1, media_1 + 3*desviacion_1, 100)
+    y_norm_1 = norm.pdf(x_norm_1, media_1, desviacion_1)
+
+    plt.rcParams["figure.figsize"] = (20,10)
+    fig, (ax1, ax2) = plt.subplots(1, 2)
+    fig.suptitle('Distribucion Theta 0 vs Theta 1')
+    ax1.plot(x_norm_0, y_norm_0)
+    ax2.plot(x_norm_1, y_norm_1)
+    ax1.axvline(x = np.percentile(x_norm_0, 5), color = 'r', label = 'axvline - full height')
+    ax1.axvline(x = np.percentile(x_norm_0, 95), color = 'r', label = 'axvline - full height')
+    ax2.axvline(x = np.percentile(x_norm_1, 5), color = 'r', label = 'axvline - full height')
+    ax2.axvline(x = np.percentile(x_norm_1, 95), color = 'r', label = 'axvline - full height')
+    plt.savefig("Distribucion_theta_1.png")
+    """
+    print("\n   > Obtenemos bootstrap´s de 5%")
+
+    theta_0_bootstrap = []
+    theta_1_bootstrap = []
+
+    # Define the list of bootstrap samples
+    bootstrap_sample_1 = [sample5.sample(n=len(sample5), replace=True) for _ in range(100)]
+    # Train the models using 2 processes
+    # results=parallel_train(bootstrap_sample_5, 4)
+    results=[]
+    pool=multiprocessing.Pool(processes=10)
+    for rep in bootstrap_sample_1:
+        pool.apply_async(train_model,[rep],callback=append_results)
+    pool.close()
+    pool.join()
+    for thetas in results:
+        theta_0_bootstrap.append(thetas[0])
+        theta_1_bootstrap.append(thetas[1])
+
+    print("\n   > Obtenemos las gráficas")
+    #theta 0
+    os.chdir(f'{directorio_actual}/graficas')
+    x=np.linspace(0, 100, len(theta_0_bootstrap))
+    y=theta_0_bootstrap
 
     p5 = np.percentile(theta_0_bootstrap, 5)
     p95 = np.percentile(theta_0_bootstrap, 95)
@@ -191,13 +262,12 @@ if __name__ == "__main__":
             plt.scatter(i, val, color='red')
         elif val>=p95:
             plt.scatter(i, val, color='red')
-            
+
     plt.axhline(y = np.percentile(theta_0_bootstrap, 5), color = 'r', label = 'axvline - full height')
     plt.axhline(y = np.percentile(theta_0_bootstrap, 95), color = 'r', label = 'axvline - full height')
     #theta 1
-    """
     x=np.linspace(0, 100, len(theta_1_bootstrap))
-    y=theta_1_bootstrap 
+    y=theta_1_bootstrap
 
     p5 = np.percentile(theta_1_bootstrap, 5)
     p95 = np.percentile(theta_1_bootstrap, 95)
@@ -207,12 +277,12 @@ if __name__ == "__main__":
             plt.scatter(i, val, color='yellow')
         elif val>=p95:
             plt.scatter(i, val, color='yellow')
-            
+
     plt.axhline(y = np.percentile(theta_1_bootstrap, 5), color = 'y', label = 'axvline - full height')
     plt.axhline(y = np.percentile(theta_1_bootstrap, 95), color = 'y', label = 'axvline - full height')
-    """
-    plt.savefig("Scatter_theta_1.png")
-    
+
+    plt.savefig("Scatter_theta_5.png")
+
     #PARA LA NORMALIZADA Y DISTRIBUCION
     plt.clf()
     desviacion = statistics.stdev(theta_0_bootstrap)
@@ -224,7 +294,7 @@ if __name__ == "__main__":
     plt.plot(x_norm, y_norm)
     plt.axvline(x = np.percentile(x_norm, 5), color = 'r', label = 'axvline - full height')
     plt.axvline(x = np.percentile(x_norm, 95), color = 'r', label = 'axvline - full height')
-    """
+
     desviacion = statistics.stdev(theta_1_bootstrap)
     media = statistics.mean(theta_1_bootstrap)
     ci = norm.interval(0.95, loc=media, scale=desviacion)
@@ -234,6 +304,5 @@ if __name__ == "__main__":
     plt.plot(x_norm, y_norm)
     plt.axvline(x = np.percentile(x_norm, 5), color = 'b', label = 'axvline - full height')
     plt.axvline(x = np.percentile(x_norm, 95), color = 'b', label = 'axvline - full height')
+    plt.savefig("Distribucion_theta_5.png")
     """
-    plt.savefig("Distribucion_theta_1.png")
-    
